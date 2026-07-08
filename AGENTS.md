@@ -95,7 +95,7 @@ Before publishing or pushing a functional change, verify:
 Current public identity:
 
 - App name: `PanePilot`
-- Bundle ID: `com.masamichiimaseki.panepilot`
+- Bundle ID: `com.jntlnlnd.panepilot`
 - Executable: `PanePilot`
 - App bundle: `PanePilot.app`
 - DMG: `PanePilot.dmg`

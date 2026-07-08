@@ -5,7 +5,7 @@ Download `PanePilot.dmg` and drag `PanePilot.app` into Applications.
 ## SHA-256
 
 ```text
-741e7f6a4b4e769f564e2c0e84656ea7f56697ba1e2b3e80c29d701b8790427a  PanePilot.dmg
+4ecd0146625ec169dd19964b47981f1fd88ed3b9e025a07b824a9ed1c887ee92  PanePilot.dmg
 ```
 
 ## macOS Notice
