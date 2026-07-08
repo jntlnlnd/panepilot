@@ -1,0 +1,54 @@
+# Release Checklist
+
+Use this checklist before publishing a GitHub release.
+
+## Local checks
+
+```sh
+scripts/generate_icons.sh
+scripts/build_app.sh
+scripts/build_dmg.sh
+codesign --verify --deep --strict .build/app/PanePilot.app
+codesign --verify --deep --strict dist/PanePilot.dmg
+```
+
+Open the app from `/Applications` and verify:
+
+- The menu bar icon appears.
+- Accessibility permission can be granted.
+- `Command+Tab` opens the switcher.
+- Arrow keys move selection while the switcher is open.
+- Window thumbnails appear after Screen Recording permission.
+- Open at Login can be enabled and disabled from the menu.
+- Diagnostic Logging is off by default.
+
+## Public release notes
+
+Mention clearly:
+
+- The app requires Accessibility permission.
+- Window thumbnails require Screen Recording permission.
+- The app has no network/analytics behavior.
+- Ad-hoc or unsigned builds may show Gatekeeper warnings unless notarized.
+
+Upload `dist/PanePilot.dmg` as a GitHub Release asset. Do not commit generated `dist/` artifacts to the source repository.
+
+## Legal and branding review
+
+- Do not imply affiliation with HyperSwitch, bahoom, or Apple.
+- Avoid Apple logos or third-party brand assets in release artwork.
+- Keep the generated icon and screenshots free of private window contents.
+- Confirm the chosen license and include it in the release repository.
+
+## Future public distribution
+
+For broad distribution, sign and notarize:
+
+```sh
+# Example only; requires Apple Developer Program credentials.
+codesign --force --options runtime --timestamp --sign "Developer ID Application: YOUR NAME (TEAMID)" .build/app/PanePilot.app
+ditto -c -k --keepParent .build/app/PanePilot.app .build/PanePilot.zip
+xcrun notarytool submit .build/PanePilot.zip --keychain-profile YOUR_PROFILE --wait
+xcrun stapler staple .build/app/PanePilot.app
+scripts/build_dmg.sh
+```
