@@ -15,6 +15,7 @@ final class SwitcherOverlay {
     private let gridView = NSView()
     private let leftChevron = NSTextField(labelWithString: "‹")
     private let rightChevron = NSTextField(labelWithString: "›")
+    private var previewCache: [String: NSImage] = [:]
 
     var isVisible: Bool {
         panel.isVisible
@@ -75,6 +76,7 @@ final class SwitcherOverlay {
     }
 
     func show(windows: [SwitchableWindow], selectedIndex: Int) {
+        previewCache.removeAll()
         update(windows: windows, selectedIndex: selectedIndex)
         panel.orderFrontRegardless()
     }
@@ -101,6 +103,7 @@ final class SwitcherOverlay {
 
     func hide() {
         panel.orderOut(nil)
+        previewCache.removeAll()
     }
 
     private func rebuildItems(windows: [SwitchableWindow], selectedIndex: Int) {
@@ -255,11 +258,24 @@ final class SwitcherOverlay {
     }
 
     private func previewImage(for window: SwitchableWindow) -> NSImage {
-        if let windowID = window.cgWindowID,
-           let cgImage = CGWindowListCreateImage(.null, .optionIncludingWindow, windowID, [.boundsIgnoreFraming, .bestResolution]) {
-            return NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+        let key = previewCacheKey(for: window)
+        if let cachedImage = previewCache[key] {
+            return cachedImage
         }
 
+        let image: NSImage
+        if let windowID = window.cgWindowID,
+           let cgImage = CGWindowListCreateImage(.null, .optionIncludingWindow, windowID, [.boundsIgnoreFraming, .bestResolution]) {
+            image = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+        } else {
+            image = fallbackPreviewImage(for: window)
+        }
+
+        previewCache[key] = image
+        return image
+    }
+
+    private func fallbackPreviewImage(for window: SwitchableWindow) -> NSImage {
         let image = NSImage(size: NSSize(width: 214, height: 96))
         image.lockFocus()
         NSColor(calibratedWhite: 0.18, alpha: 1).setFill()
@@ -269,6 +285,23 @@ final class SwitcherOverlay {
         icon.draw(in: NSRect(x: 83, y: 29, width: 48, height: 48), from: .zero, operation: .sourceOver, fraction: 0.9)
         image.unlockFocus()
         return image
+    }
+
+    private func previewCacheKey(for window: SwitchableWindow) -> String {
+        if let cgWindowID = window.cgWindowID {
+            return "cg:\(cgWindowID)"
+        }
+
+        return [
+            "ax",
+            "\(window.pid)",
+            window.bundleIdentifier ?? "",
+            window.title,
+            "\(Int(window.frame.minX))",
+            "\(Int(window.frame.minY))",
+            "\(Int(window.frame.width))",
+            "\(Int(window.frame.height))"
+        ].joined(separator: ":")
     }
 
     private func displayTitle(for window: SwitchableWindow) -> String {
