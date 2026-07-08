@@ -73,7 +73,9 @@ Before publishing or pushing a functional change, verify:
 - `Command+Tab` opens the switcher.
 - Repeated `Command+Tab` moves forward.
 - `Command+Shift+Tab` moves backward.
-- Arrow keys move selection while the switcher is open.
+- Left/right arrow keys move selection horizontally while the switcher is open.
+- Up/down arrow keys move selection vertically while the switcher is open.
+- More than five windows are shown in a 5-column grid, with up to three visible rows.
 - Releasing Command focuses the selected window.
 - Escape cancels without switching.
 - Window thumbnails appear after Screen Recording permission.

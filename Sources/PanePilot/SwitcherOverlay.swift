@@ -1,9 +1,18 @@
 import AppKit
 
 final class SwitcherOverlay {
+    static let columnCount = 5
+
+    private let itemWidth: CGFloat = 214
+    private let itemHeight: CGFloat = 140
+    private let columnSpacing: CGFloat = 22
+    private let rowSpacing: CGFloat = 18
+    private let topPadding: CGFloat = 26
+    private let bottomPadding: CGFloat = 22
+
     private let panel: NSPanel
     private let contentView = NSView()
-    private let stripView = NSStackView()
+    private let gridView = NSView()
     private let leftChevron = NSTextField(labelWithString: "‹")
     private let rightChevron = NSTextField(labelWithString: "›")
 
@@ -33,17 +42,13 @@ final class SwitcherOverlay {
         contentView.translatesAutoresizingMaskIntoConstraints = false
         panelView.addSubview(contentView)
 
-        stripView.orientation = .horizontal
-        stripView.alignment = .top
-        stripView.distribution = .equalSpacing
-        stripView.spacing = 22
-        stripView.translatesAutoresizingMaskIntoConstraints = false
+        gridView.translatesAutoresizingMaskIntoConstraints = false
 
         configureChevron(leftChevron)
         configureChevron(rightChevron)
 
         contentView.addSubview(leftChevron)
-        contentView.addSubview(stripView)
+        contentView.addSubview(gridView)
         contentView.addSubview(rightChevron)
 
         NSLayoutConstraint.activate([
@@ -60,10 +65,10 @@ final class SwitcherOverlay {
             rightChevron.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: -12),
             rightChevron.widthAnchor.constraint(equalToConstant: 34),
 
-            stripView.leadingAnchor.constraint(equalTo: leftChevron.trailingAnchor, constant: 18),
-            stripView.trailingAnchor.constraint(equalTo: rightChevron.leadingAnchor, constant: -18),
-            stripView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 26),
-            stripView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -22)
+            gridView.leadingAnchor.constraint(equalTo: leftChevron.trailingAnchor, constant: 18),
+            gridView.trailingAnchor.constraint(equalTo: rightChevron.leadingAnchor, constant: -18),
+            gridView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: topPadding),
+            gridView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -bottomPadding)
         ])
 
         panel.contentView = panelView
@@ -78,10 +83,15 @@ final class SwitcherOverlay {
         rebuildItems(windows: windows, selectedIndex: selectedIndex)
 
         let visibleFrame = NSScreen.main?.visibleFrame ?? CGRect(x: 0, y: 0, width: 900, height: 700)
-        let itemCount = min(max(windows.count, 1), 5)
-        let preferredWidth = CGFloat(itemCount) * 240 + 150
+        let layout = visibleLayout(windows: windows, selectedIndex: selectedIndex)
+        let preferredWidth = CGFloat(layout.columnCount) * itemWidth
+            + CGFloat(max(layout.columnCount - 1, 0)) * columnSpacing
+            + 150
         let width = max(520, min(preferredWidth, visibleFrame.width - 96))
-        let height: CGFloat = 196
+        let height = topPadding
+            + CGFloat(layout.rowCount) * itemHeight
+            + CGFloat(max(layout.rowCount - 1, 0)) * rowSpacing
+            + bottomPadding
         let origin = CGPoint(
             x: visibleFrame.midX - width / 2,
             y: visibleFrame.midY - height / 2
@@ -94,31 +104,48 @@ final class SwitcherOverlay {
     }
 
     private func rebuildItems(windows: [SwitchableWindow], selectedIndex: Int) {
-        stripView.arrangedSubviews.forEach { view in
-            stripView.removeArrangedSubview(view)
+        gridView.subviews.forEach { view in
             view.removeFromSuperview()
         }
 
-        let items = visibleItems(windows: windows, selectedIndex: selectedIndex)
+        let layout = visibleLayout(windows: windows, selectedIndex: selectedIndex)
+        let items = layout.items
         for itemData in items {
-            stripView.addArrangedSubview(item(for: itemData.window, selected: itemData.index == selectedIndex))
+            let itemView = item(for: itemData.window, selected: itemData.index == selectedIndex)
+            let row = (itemData.index / Self.columnCount) - layout.startRow
+            let column = itemData.index % Self.columnCount
+            gridView.addSubview(itemView)
+
+            NSLayoutConstraint.activate([
+                itemView.leadingAnchor.constraint(equalTo: gridView.leadingAnchor, constant: CGFloat(column) * (itemWidth + columnSpacing)),
+                itemView.topAnchor.constraint(equalTo: gridView.topAnchor, constant: CGFloat(row) * (itemHeight + rowSpacing))
+            ])
         }
 
         leftChevron.isHidden = selectedIndex <= 0
         rightChevron.isHidden = selectedIndex >= windows.count - 1
     }
 
-    private func visibleItems(windows: [SwitchableWindow], selectedIndex: Int) -> [(index: Int, window: SwitchableWindow)] {
-        guard windows.count > 5 else {
-            return Array(windows.enumerated()).map { ($0.offset, $0.element) }
+    private func visibleLayout(
+        windows: [SwitchableWindow],
+        selectedIndex: Int
+    ) -> (items: [(index: Int, window: SwitchableWindow)], startRow: Int, rowCount: Int, columnCount: Int) {
+        guard !windows.isEmpty else {
+            return ([], 0, 1, 1)
         }
 
         let clampedSelection = min(max(selectedIndex, 0), windows.count - 1)
-        let lowerBound = min(max(clampedSelection - 2, 0), windows.count - 5)
-        let upperBound = lowerBound + 5
-        return Array(windows[lowerBound..<upperBound].enumerated()).map { offset, window in
+        let totalRows = Int(ceil(Double(windows.count) / Double(Self.columnCount)))
+        let selectedRow = clampedSelection / Self.columnCount
+        let visibleRowCount = min(3, totalRows)
+        let startRow = min(max(selectedRow - visibleRowCount + 1, 0), max(totalRows - visibleRowCount, 0))
+        let lowerBound = startRow * Self.columnCount
+        let upperBound = min(lowerBound + visibleRowCount * Self.columnCount, windows.count)
+        let items = Array(windows[lowerBound..<upperBound].enumerated()).map { offset, window in
             (lowerBound + offset, window)
         }
+        let columnCount = windows.count > Self.columnCount ? Self.columnCount : max(windows.count, 1)
+        return (items, startRow, visibleRowCount, columnCount)
     }
 
     private func item(for window: SwitchableWindow, selected: Bool) -> NSView {
@@ -172,11 +199,15 @@ final class SwitcherOverlay {
         icon.alphaValue = selected ? 1.0 : 0.54
 
         let title = NSTextField(labelWithString: displayTitle(for: window))
+        title.translatesAutoresizingMaskIntoConstraints = false
         title.font = .systemFont(ofSize: selected ? 14 : 13, weight: selected ? .bold : .semibold)
         title.textColor = NSColor.white.withAlphaComponent(selected ? 1.0 : 0.50)
         title.alignment = .center
         title.lineBreakMode = .byTruncatingTail
         title.maximumNumberOfLines = 1
+        title.cell?.lineBreakMode = .byTruncatingTail
+        title.cell?.truncatesLastVisibleLine = true
+        title.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         title.shadow = textShadow()
 
         item.addSubview(selectionGlow)
@@ -185,8 +216,8 @@ final class SwitcherOverlay {
         item.addSubview(title)
 
         NSLayoutConstraint.activate([
-            item.widthAnchor.constraint(equalToConstant: 214),
-            item.heightAnchor.constraint(equalToConstant: 140),
+            item.widthAnchor.constraint(equalToConstant: itemWidth),
+            item.heightAnchor.constraint(equalToConstant: itemHeight),
 
             selectionGlow.leadingAnchor.constraint(equalTo: previewContainer.leadingAnchor, constant: -10),
             selectionGlow.trailingAnchor.constraint(equalTo: previewContainer.trailingAnchor, constant: 10),
@@ -241,7 +272,21 @@ final class SwitcherOverlay {
     }
 
     private func displayTitle(for window: SwitchableWindow) -> String {
-        window.title == "Untitled Window" ? window.appName : window.title
+        let trimmedTitle = window.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedTitle.isEmpty, trimmedTitle != "-", trimmedTitle != "Untitled Window" else {
+            return window.appName
+        }
+
+        let appSuffixes = [
+            " - \(window.appName)",
+            " — \(window.appName)",
+            " – \(window.appName)"
+        ]
+        let titleWithoutAppSuffix = appSuffixes.reduce(trimmedTitle) { title, suffix in
+            title.hasSuffix(suffix) ? String(title.dropLast(suffix.count)) : title
+        }
+
+        return titleWithoutAppSuffix.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func configureChevron(_ label: NSTextField) {

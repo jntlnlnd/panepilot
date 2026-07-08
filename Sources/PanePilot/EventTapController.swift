@@ -85,10 +85,15 @@ final class EventTapController {
 
         if type == .keyDown, switcher.isActive, let arrowDirection {
             DiagnosticLog.write("Arrow key captured: \(arrowDirection)")
-            if arrowDirection == .previous {
+            switch arrowDirection {
+            case .left:
                 switcher.moveSelectionBackward()
-            } else {
+            case .right:
                 switcher.moveSelectionForward()
+            case .up:
+                switcher.moveSelectionUp()
+            case .down:
+                switcher.moveSelectionDown()
             }
             return nil
         }
@@ -112,10 +117,14 @@ final class EventTapController {
 
     private func arrowDirection(for keyCode: Int64) -> ArrowDirection? {
         switch keyCode {
-        case Int64(kVK_LeftArrow), Int64(kVK_UpArrow):
-            return .previous
-        case Int64(kVK_RightArrow), Int64(kVK_DownArrow):
-            return .next
+        case Int64(kVK_LeftArrow):
+            return .left
+        case Int64(kVK_RightArrow):
+            return .right
+        case Int64(kVK_UpArrow):
+            return .up
+        case Int64(kVK_DownArrow):
+            return .down
         default:
             return nil
         }
@@ -140,6 +149,8 @@ final class EventTapController {
 }
 
 private enum ArrowDirection: String {
-    case previous
-    case next
+    case left
+    case right
+    case up
+    case down
 }

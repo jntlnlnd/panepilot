@@ -50,4 +50,6 @@ For the fuller repeatable release and publishing workflow, see `AGENTS.md` and `
 6. Press Tab repeatedly while holding Command and confirm the selection moves.
 7. Release Command and confirm the selected window is focused.
 8. Press `Command+Shift+Tab` and confirm reverse cycling.
-9. Press Escape while the overlay is open and confirm the current window stays focused.
+9. Press left/right arrows and confirm horizontal movement.
+10. Press up/down arrows with more than five windows open and confirm vertical movement.
+11. Press Escape while the overlay is open and confirm the current window stays focused.

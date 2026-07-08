@@ -57,6 +57,14 @@ final class SwitcherController {
         moveSelection(reverse: true)
     }
 
+    func moveSelectionUp() {
+        moveSelectionVertically(offset: -SwitcherOverlay.columnCount)
+    }
+
+    func moveSelectionDown() {
+        moveSelectionVertically(offset: SwitcherOverlay.columnCount)
+    }
+
     private func begin(reverse: Bool) {
         windows = accessibility.visibleWindows()
         DiagnosticLog.write("discovered \(windows.count) switchable windows")
@@ -110,6 +118,14 @@ final class SwitcherController {
             selectedIndex = (selectedIndex + 1) % windows.count
         }
 
+        overlay.update(windows: windows, selectedIndex: selectedIndex)
+    }
+
+    private func moveSelectionVertically(offset: Int) {
+        guard !windows.isEmpty else { return }
+
+        let targetIndex = selectedIndex + offset
+        selectedIndex = min(max(targetIndex, 0), windows.count - 1)
         overlay.update(windows: windows, selectedIndex: selectedIndex)
     }
 }
