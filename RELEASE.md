@@ -35,7 +35,7 @@ For this initial public repository, `release/PanePilot.dmg` is committed so the 
 
 ## Legal and branding review
 
-- Do not imply affiliation with HyperSwitch, bahoom, or Apple.
+- Do not imply affiliation with third-party apps, services, or Apple.
 - Avoid Apple logos or third-party brand assets in release artwork.
 - Keep the generated icon and screenshots free of private window contents.
 - Confirm the chosen license and include it in the release repository.

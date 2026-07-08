@@ -42,7 +42,7 @@ For the fuller repeatable release and publishing workflow, see `AGENTS.md` and `
 
 ## Manual verification checklist
 
-1. Launch the app and confirm the `HS` menu bar item appears.
+1. Launch the app and confirm the PanePilot menu bar icon appears.
 2. Grant Accessibility permission.
 3. Grant Screen Recording permission if previews are blank.
 4. Open several windows across two or more apps.

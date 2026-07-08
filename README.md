@@ -1,8 +1,10 @@
 # PanePilot
 
-HyperSwitch-style window switcher for macOS. It replaces the usual application-level `Command+Tab` flow with a window-level switcher backed by macOS Accessibility APIs.
+**Download: [click here](https://raw.githubusercontent.com/jntlnlnd/panepilot/main/release/PanePilot.dmg)**
 
-This project is not affiliated with HyperSwitch, bahoom, or Apple.
+Windows-style window switcher for macOS. It replaces the usual application-level `Command+Tab` flow with a window-level switcher backed by macOS Accessibility APIs.
+
+This project is not affiliated with Apple.
 
 ## Current behavior
 
@@ -53,7 +55,7 @@ scripts/generate_icons.sh
 
 ## Download
 
-The current local DMG is included at [release/PanePilot.dmg](release/PanePilot.dmg). This build is ad-hoc signed and not notarized, so macOS may show a first-run warning.
+The current DMG can be downloaded directly from [release/PanePilot.dmg](https://raw.githubusercontent.com/jntlnlnd/panepilot/main/release/PanePilot.dmg). This build is ad-hoc signed and not notarized, so macOS may show a first-run warning.
 
 If `swift` or `xcodebuild` fails with an active developer path error, install or select Xcode first:
 

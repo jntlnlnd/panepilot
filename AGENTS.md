@@ -87,7 +87,7 @@ Before publishing or pushing a functional change, verify:
 - Do not log window titles, screenshots, thumbnails, paths, or other sensitive user content by default.
 - Keep permission usage documented in `README.md`, `PRIVACY.md`, and `SECURITY.md`.
 - Keep generated screenshots and release artwork free of private window contents.
-- Do not imply affiliation with HyperSwitch, bahoom, or Apple.
+- Do not imply affiliation with third-party apps, services, or Apple.
 - Do not commit credentials, Apple Developer certificates, notarization profiles, API keys, or private keys.
 
 ## Naming And Bundle Identity

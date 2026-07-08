@@ -31,20 +31,18 @@ Owns the switcher state machine:
 
 ### `SwitcherOverlay`
 
-Shows a non-activating translucent `NSPanel` above all spaces. The list displays up to eight visible rows around the current selection, with app icon, window title, and app name.
+Shows a non-activating translucent `NSPanel` above all spaces. The overlay presents visible windows in a horizontal Windows-style switcher with window thumbnails, app icons, window titles, and a highlighted current selection.
 
 ## Known limitations
 
 - Replacing the system `Command+Tab` depends on Accessibility permission and a working event tap.
 - Minimized windows are intentionally omitted for the first version.
-- Window preview thumbnails are not implemented yet.
+- Window preview thumbnails require Screen Recording permission.
 - Some Electron, browser, or cross-platform apps may expose unusual Accessibility metadata.
-- The app is not sandboxed or signed yet.
+- The app is ad-hoc signed for local builds, but not notarized.
 
 ## Next implementation milestones
 
 1. Add preferences for shortcut customization and minimized-window behavior.
-2. Add window thumbnails via `CGWindowListCreateImage`.
-3. Add a signed app target or generated Xcode project for release builds.
-4. Add launch-at-login support through `SMAppService`.
-5. Add UI tests or a small diagnostic mode that logs AX window discovery.
+2. Add a signed app target or generated Xcode project for release builds.
+3. Add UI tests or a small diagnostic mode that logs AX window discovery.
