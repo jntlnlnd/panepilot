@@ -51,6 +51,10 @@ If `Sources/PanePilot/Resources/Assets/AppIconSource.png` changes, regenerate th
 scripts/generate_icons.sh
 ```
 
+## Download
+
+The current local DMG is included at [release/PanePilot.dmg](release/PanePilot.dmg). This build is ad-hoc signed and not notarized, so macOS may show a first-run warning.
+
 If `swift` or `xcodebuild` fails with an active developer path error, install or select Xcode first:
 
 ```sh

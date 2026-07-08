@@ -31,7 +31,7 @@ Mention clearly:
 - The app has no network/analytics behavior.
 - Ad-hoc or unsigned builds may show Gatekeeper warnings unless notarized.
 
-Upload `dist/PanePilot.dmg` as a GitHub Release asset. Do not commit generated `dist/` artifacts to the source repository.
+For this initial public repository, `release/PanePilot.dmg` is committed so the app can be downloaded directly. For future releases, prefer uploading `dist/PanePilot.dmg` as a GitHub Release asset instead of committing generated binaries.
 
 ## Legal and branding review
 
